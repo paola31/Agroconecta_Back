@@ -1,0 +1,18 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: asdPaola50
+      MYSQL_DATABASE: Agroconecta
+      MYSQL_USER: agro_backend
+      MYSQL_PASSWORD: agro_backend123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init:/docker-entrypoint-initdb.d
+    restart: always
+
+volumes:
+  mysql_data:
