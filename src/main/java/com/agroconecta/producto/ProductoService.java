@@ -1,8 +1,8 @@
 package com.agroconecta.producto;
 
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -53,6 +53,7 @@ public class ProductoService {
     @Transactional
     public void desactivar(Long id) {
         Producto producto = buscarPorId(id);
+        // Borrado logico: conserva el registro para mantener trazabilidad e integridad con tablas relacionadas
         producto.setActivo(false);
         productoRepository.save(producto);
     }
