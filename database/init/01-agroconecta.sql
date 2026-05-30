@@ -449,6 +449,7 @@ CREATE TABLE `usuarios` (
   `email` varchar(160) NOT NULL,
   `telefono` varchar(30) DEFAULT NULL,
   `rol` enum('campesino','cliente','admin') NOT NULL,
+  `password_hash` varchar(64) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `estado` enum('activo','inactivo') NOT NULL DEFAULT 'activo',
@@ -464,7 +465,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,'Carlos Ruiz','carlos@example.com','3001112222','cliente','2025-08-24 21:15:09','2025-08-24 21:15:09','activo'),(2,'Juana Campesina','juana@example.com','3002223333','campesino','2025-08-24 21:15:09','2025-08-24 21:15:09','activo'),(3,'Mario Productor','mario@example.com','3003334444','campesino','2025-08-24 21:15:09','2025-08-24 21:15:09','activo');
+INSERT INTO `usuarios` VALUES (1,'Carlos Ruiz','carlos@example.com','3001112222','cliente','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','2025-08-24 21:15:09','2025-08-24 21:15:09','activo'),(2,'Juana Campesina','juana@example.com','3002223333','campesino','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','2025-08-24 21:15:09','2025-08-24 21:15:09','activo'),(3,'Mario Productor','mario@example.com','3003334444','campesino','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','2025-08-24 21:15:09','2025-08-24 21:15:09','activo');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 

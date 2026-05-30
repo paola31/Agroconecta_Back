@@ -4,38 +4,31 @@ Backend en Java con Spring Boot para los modulos de productos e inventario/stock
 
 Este repositorio contiene lo necesario para ejecutar el backend y levantar una base MySQL local con Docker.
 
-## Evidencia AA3-EV01
+## Evidencia actual AA5-EV01
 
-Este proyecto se presenta para la evidencia `GA7-220501096-AA3-EV01 - codificacion de modulos del software Stand alone, web y movil de acuerdo al proyecto a desarrollar`.
+Esta version del repositorio se actualiza para la evidencia `GA7-220501096-AA5-EV01 - diseno y desarrollo de servicios web - caso`. La entrega incorpora una API REST de autenticacion para el proyecto AgroConecta, con servicios de registro e inicio de sesion.
 
-Para esta evidencia se selecciona el desarrollo web de los modulos de productos e inventario/stock del proyecto Agroconecta. La implementacion se realiza con Spring Boot como framework Java, exponiendo una API REST conectada a MySQL.
+Servicios agregados para esta evidencia:
 
-Alcance del modulo:
+- `POST /api/auth/register`: registra un usuario nuevo en la base de datos.
+- `POST /api/auth/login`: valida correo y contrasena para iniciar sesion.
 
-- Consultar productos activos.
-- Consultar producto por identificador.
-- Registrar productos.
-- Actualizar productos.
-- Desactivar productos mediante borrado logico.
-- Consultar registros de stock.
-- Registrar cantidades de stock por usuario y producto.
-- Actualizar cantidades de stock.
-- Eliminar registros de stock.
+## Alcance de esta entrega
 
-Artefactos previos considerados:
+Esta entrega corresponde a la evidencia `GA7-220501096-AA5-EV01 - diseno y desarrollo de servicios web - caso`.
 
-- `GA4-220501095-AA2-EV02`: informe de entregables y requisitos funcionales del proyecto. Se toman como referencia `RF2 - Publicacion de productos`, `RF3 - Busqueda de productos` y `RF5 - Gestion de disponibilidad de productos`.
-- `GA4-220501095-AA2-EV04`: diagrama de clases del proyecto, donde se identifica `Producto` como una clase principal del dominio.
-- `GA4-220501095-AA2-EV05`: arquitectura de software. Aunque en la planeacion se contemplo Laravel/MVC, para esta evidencia se ajusta la tecnologia a Spring Boot porque la actividad solicita aplicar frameworks de Java.
-- `GA4-220501095-AA4-EV04`: evaluacion de artefactos de diseno, usada como referencia para mantener trazabilidad entre requisitos, diseno e implementacion.
+Se implementa una API REST de autenticacion para el proyecto AgroConecta con dos servicios principales:
 
-Arquitectura aplicada:
+- Registro de usuario.
+- Inicio de sesion con validacion de correo y contrasena.
+
+La implementacion usa arquitectura por capas:
 
 ```text
 Controller -> Service -> Repository -> MySQL
 ```
 
-El backend usa arquitectura por capas con controladores REST, servicios de negocio, repositorios de persistencia, DTOs y entidades JPA.
+El backend usa controladores REST, servicios de negocio, repositorios de persistencia, DTOs y entidades JPA.
 
 ## Tecnologias
 
@@ -245,26 +238,18 @@ Eliminar stock:
 curl -X DELETE http://localhost:8081/api/stock/1
 ```
 
-## Verificacion Realizada
+## Verificacion de la Evidencia AA5-EV01
 
-Para validar la implementacion se ejecutaron las siguientes verificaciones:
+Para validar esta evidencia se prepararon los siguientes casos de prueba para Postman o curl:
 
-```bash
-mvn package
-```
+- `POST /api/auth/register`: registro correcto de usuario.
+- `POST /api/auth/register`: validacion de correo repetido.
+- `POST /api/auth/login`: inicio de sesion correcto.
+- `POST /api/auth/login`: error con contrasena incorrecta.
+- `POST /api/auth/login`: error con correo no registrado.
+- Validacion de campos obligatorios en registro e inicio de sesion.
 
-Resultado: compilacion correcta del proyecto.
-
-Tambien se probaron endpoints HTTP del modulo de stock:
-
-- `GET /api/stock`: consulta general de stock.
-- `GET /api/stock/1`: consulta por identificador.
-- `POST /api/stock`: creacion de registro temporal.
-- `PUT /api/stock/{id}`: actualizacion del registro temporal.
-- `DELETE /api/stock/{id}`: eliminacion del registro temporal.
-- `POST /api/stock` con cantidad negativa: validacion de datos de entrada.
-
-Durante la prueba se creo un registro temporal de stock, se actualizo y posteriormente se elimino para conservar limpia la base de datos.
+En este equipo no se ejecuto `mvn test` porque Maven no esta instalado y el proyecto no incluye Maven Wrapper (`mvnw`). La prueba funcional debe realizarse levantando MySQL con Docker, ejecutando el backend con Maven y probando los endpoints documentados en `ENDPOINTS_AA5_EV01.md`.
 
 ## Relacion con el Frontend
 
@@ -325,4 +310,73 @@ src/main/java/com/agroconecta/stock/StockController.java
 src/main/java/com/agroconecta/stock/StockService.java
 src/main/java/com/agroconecta/stock/StockRepository.java
 src/main/java/com/agroconecta/stock/Stock.java
+```
+
+## Evidencia AA5-EV01 - Servicios Web de Registro e Inicio de Sesion
+
+Para la evidencia `GA7-220501096-AA5-EV01 - diseno y desarrollo de servicios web - caso` se agrego una API REST de autenticacion basica.
+
+Endpoints implementados:
+
+```text
+POST /api/auth/register
+POST /api/auth/login
+```
+
+El registro crea usuarios en la tabla `usuarios` y guarda la contrasena como hash SHA-256 en el campo `password_hash`. El inicio de sesion valida correo, contrasena y estado activo del usuario.
+
+Ejemplo de registro:
+
+```bash
+curl -X POST http://localhost:8081/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombre": "Ana Cliente",
+    "email": "ana.cliente@example.com",
+    "telefono": "3005556677",
+    "rol": "cliente",
+    "password": "123456"
+  }'
+```
+
+Ejemplo de inicio de sesion correcto:
+
+```bash
+curl -X POST http://localhost:8081/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "ana.cliente@example.com",
+    "password": "123456"
+  }'
+```
+
+Respuesta esperada:
+
+```json
+{
+  "mensaje": "Autenticacion satisfactoria",
+  "usuarioId": 4,
+  "nombre": "Ana Cliente",
+  "email": "ana.cliente@example.com",
+  "rol": "cliente"
+}
+```
+
+Ejemplo de inicio de sesion incorrecto:
+
+```bash
+curl -X POST http://localhost:8081/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "ana.cliente@example.com",
+    "password": "claveIncorrecta"
+  }'
+```
+
+Respuesta esperada: `401 Unauthorized` con mensaje `Error en la autenticacion`.
+
+Si ya existe una base creada antes de esta evidencia, ejecutar primero:
+
+```text
+database/migrations/2026-05-30-aa5-auth.sql
 ```

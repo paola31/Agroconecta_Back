@@ -1,0 +1,4 @@
+Repositorio del proyecto AgroConecta Back:
+
+git@github.com:paola31/Agroconecta_Back.git
+https://github.com/paola31/Agroconecta_Back
