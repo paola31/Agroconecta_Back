@@ -465,7 +465,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,'Carlos Ruiz','carlos@example.com','3001112222','cliente','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','2025-08-24 21:15:09','2025-08-24 21:15:09','activo'),(2,'Juana Campesina','juana@example.com','3002223333','campesino','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','2025-08-24 21:15:09','2025-08-24 21:15:09','activo'),(3,'Mario Productor','mario@example.com','3003334444','campesino','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','2025-08-24 21:15:09','2025-08-24 21:15:09','activo');
+INSERT INTO `usuarios` VALUES (1,'Carlos Ruiz','carlos@example.com','3001112222','cliente','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','2025-08-24 21:15:09','2025-08-24 21:15:09','activo'),(2,'Juana Campesina','juana@example.com','3002223333','campesino','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','2025-08-24 21:15:09','2025-08-24 21:15:09','activo'),(3,'Mario Productor','mario@example.com','3003334444','campesino','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','2025-08-24 21:15:09','2025-08-24 21:15:09','activo'),(4,'Administradora Agroconecta','admin@agroconecta.com','3000000000','admin','9d294448bc813783e67632b5f13cd29a8964309ef878f95ac2a4b4e5a6e768d6','2026-08-08 12:00:00','2026-08-08 12:00:00','activo');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
