@@ -1,0 +1,16 @@
+.git
+.github
+.idea
+.vscode
+target
+*.log
+*.docx
+*.xlsx
+*.pdf
+*.zip
+manual/
+documentos/
+guias/
+contenedores/
+dimension-produccion/
+ref/
