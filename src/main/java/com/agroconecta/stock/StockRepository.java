@@ -19,6 +19,8 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
 
     Optional<Stock> findByUsuarioIdAndProductoId(Long usuarioId, Long productoId);
 
+    boolean existsByProductoId(Long productoId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Stock> findByProductoIdOrderByIdAsc(Long productoId);
 }

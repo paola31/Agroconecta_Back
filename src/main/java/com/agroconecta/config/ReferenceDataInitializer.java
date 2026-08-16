@@ -4,6 +4,8 @@ import com.agroconecta.pedido.MetodoPago;
 import com.agroconecta.pedido.MetodoPagoRepository;
 import com.agroconecta.producto.Producto;
 import com.agroconecta.producto.ProductoRepository;
+import com.agroconecta.stock.Stock;
+import com.agroconecta.stock.StockRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -16,10 +18,14 @@ import java.util.List;
 public class ReferenceDataInitializer implements ApplicationRunner {
     private final MetodoPagoRepository metodoPagoRepository;
     private final ProductoRepository productoRepository;
+    private final StockRepository stockRepository;
 
-    public ReferenceDataInitializer(MetodoPagoRepository metodoPagoRepository, ProductoRepository productoRepository) {
+    public ReferenceDataInitializer(MetodoPagoRepository metodoPagoRepository,
+                                    ProductoRepository productoRepository,
+                                    StockRepository stockRepository) {
         this.metodoPagoRepository = metodoPagoRepository;
         this.productoRepository = productoRepository;
+        this.stockRepository = stockRepository;
     }
 
     @Override
@@ -33,6 +39,7 @@ public class ReferenceDataInitializer implements ApplicationRunner {
                 "Manzanas", "Bananos", "Zanahorias", "Cebolla morada", "Papa", "Uva morada silvestre"
         );
         productosCatalogo.forEach(this::crearProductoSiNoExiste);
+        productoRepository.findByActivoTrueOrderByNombreAsc().forEach(this::crearStockSiNoExiste);
     }
 
     private void crearMetodoSiNoExiste(String nombre) {
@@ -53,6 +60,16 @@ public class ReferenceDataInitializer implements ApplicationRunner {
             producto.setPrecioUnitario(new BigDecimal("5000.00"));
             producto.setActivo(true);
             productoRepository.save(producto);
+        }
+    }
+
+    private void crearStockSiNoExiste(Producto producto) {
+        if (!stockRepository.existsByProductoId(producto.getId())) {
+            Stock stock = new Stock();
+            stock.setUsuarioId(2L);
+            stock.setProducto(producto);
+            stock.setCantidad(new BigDecimal("20.000"));
+            stockRepository.save(stock);
         }
     }
 }
