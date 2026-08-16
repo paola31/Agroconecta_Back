@@ -13,6 +13,8 @@ import com.agroconecta.pedido.dto.PedidoRequest;
 import com.agroconecta.pedido.dto.PedidoResponse;
 import com.agroconecta.producto.Producto;
 import com.agroconecta.producto.ProductoRepository;
+import com.agroconecta.stock.Stock;
+import com.agroconecta.stock.StockRepository;
 import com.agroconecta.usuario.Usuario;
 import com.agroconecta.usuario.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,8 +25,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,6 +41,7 @@ class PedidoServiceTest {
     private DetallePedidoRepository detalleRepository;
     private PagoPedidoRepository pagoRepository;
     private EstadoPedidoRepository estadoRepository;
+    private StockRepository stockRepository;
     private PedidoService pedidoService;
 
     @BeforeEach
@@ -49,12 +54,47 @@ class PedidoServiceTest {
         detalleRepository = mock(DetallePedidoRepository.class);
         pagoRepository = mock(PagoPedidoRepository.class);
         estadoRepository = mock(EstadoPedidoRepository.class);
+        stockRepository = mock(StockRepository.class);
         pedidoService = new PedidoService(usuarioRepository, productoRepository, metodoPagoRepository,
-                direccionRepository, pedidoRepository, detalleRepository, pagoRepository, estadoRepository);
+                direccionRepository, pedidoRepository, detalleRepository, pagoRepository, estadoRepository,
+                stockRepository);
     }
 
     @Test
-    void registraPedidoConDetalleDireccionYPagoPendiente() {
+    void registraPedidoYDescuentaExistencias() {
+        prepararDatosBasicos();
+        Stock existencia = existencia("10.000");
+        when(stockRepository.findByProductoIdOrderByIdAsc(101L)).thenReturn(List.of(existencia));
+
+        PedidoResponse response = pedidoService.crear(request(), 1L);
+
+        assertEquals(5002L, response.getPedidoId());
+        assertEquals(new BigDecimal("10000.00"), response.getSubtotal());
+        assertEquals(new BigDecimal("18500.00"), response.getTotal());
+        assertEquals(new BigDecimal("8.000"), existencia.getCantidad());
+        verify(stockRepository).save(existencia);
+        verify(detalleRepository).save(any());
+        verify(pagoRepository).save(any());
+        verify(estadoRepository).save(any());
+    }
+
+    @Test
+    void rechazaPedidoCuandoNoHayExistenciasSuficientes() {
+        prepararDatosBasicos();
+        when(stockRepository.findByProductoIdOrderByIdAsc(101L))
+                .thenReturn(List.of(existencia("1.000")));
+
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> pedidoService.crear(request(), 1L)
+        );
+
+        assertEquals("Existencias insuficientes para Ajo. Disponible: 1", error.getMessage());
+        verify(pedidoRepository, never()).save(any());
+        verify(detalleRepository, never()).save(any());
+    }
+
+    private void prepararDatosBasicos() {
         Usuario cliente = new Usuario();
         cliente.setId(1L);
         cliente.setRol("cliente");
@@ -82,15 +122,13 @@ class PedidoServiceTest {
                 .thenReturn(Optional.of(ajo));
         when(direccionRepository.save(any(DireccionCliente.class))).thenReturn(direccion);
         when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedido);
+    }
 
-        PedidoResponse response = pedidoService.crear(request());
-
-        assertEquals(5002L, response.getPedidoId());
-        assertEquals(new BigDecimal("10000.00"), response.getSubtotal());
-        assertEquals(new BigDecimal("18500.00"), response.getTotal());
-        verify(detalleRepository).save(any());
-        verify(pagoRepository).save(any());
-        verify(estadoRepository).save(any());
+    private Stock existencia(String cantidad) {
+        Stock stock = new Stock();
+        stock.setId(1L);
+        stock.setCantidad(new BigDecimal(cantidad));
+        return stock;
     }
 
     private PedidoRequest request() {
@@ -99,7 +137,7 @@ class PedidoServiceTest {
         item.setCantidad(2);
 
         PedidoRequest request = new PedidoRequest();
-        request.setClienteId(1L);
+        request.setClienteId(999L);
         request.setNombreDestinatario("Carlos Ruiz");
         request.setTelefono("3001112222");
         request.setDireccion("Calle 10 # 5-30");
