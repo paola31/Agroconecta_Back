@@ -7,13 +7,15 @@ public class AuthResponse {
     private String nombre;
     private String email;
     private String rol;
+    private String token;
 
-    public AuthResponse(String mensaje, Long usuarioId, String nombre, String email, String rol) {
+    public AuthResponse(String mensaje, Long usuarioId, String nombre, String email, String rol, String token) {
         this.mensaje = mensaje;
         this.usuarioId = usuarioId;
         this.nombre = nombre;
         this.email = email;
         this.rol = rol;
+        this.token = token;
     }
 
     public String getMensaje() {
@@ -54,5 +56,12 @@ public class AuthResponse {
 
     public void setRol(String rol) {
         this.rol = rol;
+    }
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

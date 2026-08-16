@@ -1,6 +1,7 @@
 import com.agroconecta.auth.AuthService;
 import com.agroconecta.auth.InvalidCredentialsException;
 import com.agroconecta.auth.PasswordHashService;
+import com.agroconecta.auth.TokenService;
 import com.agroconecta.auth.dto.AuthResponse;
 import com.agroconecta.auth.dto.LoginRequest;
 import com.agroconecta.usuario.Usuario;
@@ -23,7 +24,11 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         usuarioRepository = mock(UsuarioRepository.class);
-        authService = new AuthService(usuarioRepository, new PasswordHashService());
+        TokenService tokenService = new TokenService(
+                "test-secret-key-for-agroconecta-security-tests-2026",
+                60
+        );
+        authService = new AuthService(usuarioRepository, new PasswordHashService(), tokenService);
     }
 
     @Test
@@ -36,6 +41,7 @@ class AuthServiceTest {
         assertEquals("Autenticacion satisfactoria", response.getMensaje());
         assertEquals("admin", response.getRol());
         assertEquals(admin.getEmail(), response.getEmail());
+        org.junit.jupiter.api.Assertions.assertNotNull(response.getToken());
     }
 
     @Test
